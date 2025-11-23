@@ -1,6 +1,3 @@
-# firewall.tf
-# Configuración de reglas de firewall
-
 resource "google_compute_firewall" "deny_all_ingress" {
   name    = "deny-all-ingress"
   network = google_compute_network.secure_vpc.name
@@ -9,8 +6,9 @@ resource "google_compute_firewall" "deny_all_ingress" {
     protocol = "all"
   }
 
-  priority  = 65534
-  direction = "INGRESS"
+  priority      = 65534
+  direction     = "INGRESS"
+  source_ranges = ["0.0.0.0/0"]
 }
 
 resource "google_compute_firewall" "allow_iap_ssh" {
@@ -22,6 +20,7 @@ resource "google_compute_firewall" "allow_iap_ssh" {
     ports    = ["22"]
   }
 
-  source_ranges = ["35.235.240.0/20"]
+  source_ranges = ["35.235.240.0/20"] # Identity-Aware Proxy (IAP)
   direction     = "INGRESS"
+  priority      = 1000
 }
