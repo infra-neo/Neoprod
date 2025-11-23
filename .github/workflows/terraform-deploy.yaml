@@ -30,9 +30,11 @@ jobs:
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
 
+
       - name: Terraform Init
         working-directory: infra/gcp
-        run: terraform init
+        run: terraform init -backend-config=backend-config.hcl
+
 
       - name: Terraform Plan
         working-directory: infra/gcp
