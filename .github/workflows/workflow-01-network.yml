@@ -1,0 +1,31 @@
+name: Test - Blueprint 1 Network Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  network-build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Terraform Init
+      working-directory: blueprints/network_build
+      run: terraform init
+
+    - name: Terraform Plan
+      working-directory: blueprints/network_build
+      run: terraform plan
+
+    - name: Terraform Apply
+      working-directory: blueprints/network_build
+      run: terraform apply -auto-approve
