@@ -1,0 +1,26 @@
+name: Test - Blueprint 3 VM Builder
+
+on:
+  workflow_dispatch:
+
+jobs:
+  vm-builder:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Terraform Init
+      working-directory: blueprints/vm_builder
+      run: terraform init
+
+    - name: Terraform Apply
+      working-directory: blueprints/vm_builder
+      run: terraform apply -auto-approve
