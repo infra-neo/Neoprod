@@ -53,8 +53,8 @@ services:
       CONFIG_FILE: /pomerium/config.yaml
 
     volumes:
-      - ./config.yaml:/pomerium/config.yaml:ro
-      - ./certs:/pomerium:ro
+      - /opt/pomerium/config/config.yaml:/pomerium/config.yaml:ro
+      - /opt/pomerium/certs:/pomerium:ro
       - pomerium-data:/var/lib/pomerium
     networks:
       - pomerium-net

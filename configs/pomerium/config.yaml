@@ -6,9 +6,11 @@ authenticate_service_url: https://authenticate.pomerium.local
 
 # Routes configuration - Define your applications here
 routes:
-  # Pomerium Dashboard - Auto-login portal
+  # Pomerium Dashboard - Routes Portal
+  # This enables the built-in Pomerium routes portal at /.pomerium/
+  # Users will see all routes they have access to based on their groups
   - from: https://dashboard.pomerium.local
-    to: https://console.pomerium.local
+    to: http://pomerium
     pass_identity_headers: true
     allow_public_unauthenticated_access: false
     show_error_details: true
@@ -20,7 +22,7 @@ routes:
                 is: pomerium-users
             - groups:
                 is: admin
-    # Enable routes portal to show available apps
+    # Enable this route in the portal
     show_in_routes_portal: true
 
   # Example application route - adjust as needed

@@ -41,7 +41,7 @@ cat > /opt/netbird/netbird-config.sh << 'EOF'
 #!/bin/bash
 # Configure Netbird with setup key
 # Run this after obtaining the setup key from VM1 Netbird dashboard
-# netbird up --setup-key YOUR_SETUP_KEY_HERE --management-url http://netbird-mgmt.internal:8080
+# netbird up --setup-key YOUR_SETUP_KEY_HERE --management-url https://netbird-mgmt.internal:443
 echo "Netbird configuration script ready"
 echo "Run with setup key: netbird up --setup-key <YOUR_KEY>"
 EOF

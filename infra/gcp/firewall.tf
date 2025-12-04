@@ -25,21 +25,30 @@ resource "google_compute_firewall" "allow_iap_ssh" {
   priority      = 1000
 }
 
-# Allow internal VPC communication for Netbird mesh
+# Allow internal VPC communication for essential services
 resource "google_compute_firewall" "allow_internal" {
   name    = "allow-internal-vpc"
   network = google_compute_network.secure_vpc.name
 
+  # Allow HTTPS and HTTP for web services
   allow {
     protocol = "tcp"
-    ports    = ["0-65535"]
+    ports    = ["80", "443"]
   }
 
+  # Allow common service ports
+  allow {
+    protocol = "tcp"
+    ports    = ["8080", "8443", "3000", "5432"]
+  }
+
+  # Allow DNS
   allow {
     protocol = "udp"
-    ports    = ["0-65535"]
+    ports    = ["53"]
   }
 
+  # Allow ICMP for connectivity testing
   allow {
     protocol = "icmp"
   }
