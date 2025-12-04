@@ -1,0 +1,272 @@
+version: '3.8'
+
+# Test Applications for Pomerium Integration
+# These are sample applications to demonstrate the Zero Trust architecture
+
+services:
+  # Simple HTTP echo server - App 1
+  app1:
+    image: mendhak/http-https-echo:latest
+    container_name: test-app1
+    ports:
+      - "8080:8080"
+    environment:
+      - HTTP_PORT=8080
+      - LOG_WITHOUT_NEWLINE=true
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://app1.pomerium.local"
+      - "pomerium.route.to=http://app1:8080"
+      - "pomerium.route.policy.allow.groups=app1-users,admin"
+
+  # Nginx static site - App 2
+  app2:
+    image: nginx:alpine
+    container_name: test-app2
+    ports:
+      - "8081:80"
+    volumes:
+      - ./app2:/usr/share/nginx/html:ro
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://app2.pomerium.local"
+      - "pomerium.route.to=http://app2:80"
+      - "pomerium.route.policy.allow.groups=app2-users,admin"
+
+  # Whoami - Identity test app
+  whoami:
+    image: traefik/whoami:latest
+    container_name: test-whoami
+    ports:
+      - "8082:80"
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://whoami.pomerium.local"
+      - "pomerium.route.to=http://whoami:80"
+      - "pomerium.route.policy.allow.groups=pomerium-users,admin"
+
+  # Simple file browser
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: test-filebrowser
+    ports:
+      - "8083:80"
+    volumes:
+      - ./files:/srv
+      - ./filebrowser.db:/database.db
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://files.pomerium.local"
+      - "pomerium.route.to=http://filebrowser:80"
+      - "pomerium.route.policy.allow.groups=admin"
+
+  # Code Server (VS Code in browser)
+  code-server:
+    image: codercom/code-server:latest
+    container_name: test-code-server
+    ports:
+      - "8084:8080"
+    environment:
+      - PASSWORD=changeme
+    volumes:
+      - ./code-workspace:/home/coder/project
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://code.pomerium.local"
+      - "pomerium.route.to=http://code-server:8080"
+      - "pomerium.route.policy.allow.groups=developers,admin"
+
+  # Grafana - Dashboard example
+  grafana:
+    image: grafana/grafana:latest
+    container_name: test-grafana
+    ports:
+      - "8085:3000"
+    environment:
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_AUTH_PROXY_ENABLED=true
+      - GF_AUTH_PROXY_HEADER_NAME=X-Pomerium-Claim-Email
+      - GF_AUTH_PROXY_HEADER_PROPERTY=email
+      - GF_AUTH_PROXY_AUTO_SIGN_UP=true
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://grafana.pomerium.local"
+      - "pomerium.route.to=http://grafana:3000"
+      - "pomerium.route.policy.allow.groups=monitoring,admin"
+
+  # Portainer - Container management
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: test-portainer
+    ports:
+      - "8086:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://portainer.pomerium.local"
+      - "pomerium.route.to=http://portainer:9000"
+      - "pomerium.route.policy.allow.groups=admin"
+
+  # Uptime Kuma - Monitoring
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: test-uptime-kuma
+    ports:
+      - "8087:3001"
+    volumes:
+      - uptime-kuma-data:/app/data
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://uptime.pomerium.local"
+      - "pomerium.route.to=http://uptime-kuma:3001"
+      - "pomerium.route.policy.allow.groups=monitoring,admin"
+
+  # Wekan - Kanban board
+  wekan:
+    image: wekanteam/wekan:latest
+    container_name: test-wekan
+    ports:
+      - "8088:8080"
+    environment:
+      - MONGO_URL=mongodb://wekan-db:27017/wekan
+      - ROOT_URL=http://localhost:8088
+    depends_on:
+      - wekan-db
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://wekan.pomerium.local"
+      - "pomerium.route.to=http://wekan:8080"
+      - "pomerium.route.policy.allow.groups=project-managers,admin"
+
+  wekan-db:
+    image: mongo:5
+    container_name: test-wekan-db
+    volumes:
+      - wekan-db-data:/data/db
+    networks:
+      - pomerium-network
+
+  # Draw.io - Diagramming tool
+  drawio:
+    image: jgraph/drawio:latest
+    container_name: test-drawio
+    ports:
+      - "8089:8080"
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://drawio.pomerium.local"
+      - "pomerium.route.to=http://drawio:8080"
+      - "pomerium.route.policy.allow.groups=pomerium-users,admin"
+
+  # Apache Guacamole - Remote Desktop Gateway (HTML5)
+  guacamole-db:
+    image: postgres:15
+    container_name: guacamole-postgres
+    environment:
+      POSTGRES_DB: guacamole_db
+      POSTGRES_USER: guacamole_user
+      POSTGRES_PASSWORD: guacamole_pass
+    volumes:
+      - guacamole-db-data:/var/lib/postgresql/data
+      - ./guacamole-initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
+    networks:
+      - pomerium-network
+    restart: unless-stopped
+
+  guacd:
+    image: guacamole/guacd:latest
+    container_name: guacd
+    networks:
+      - pomerium-network
+    restart: unless-stopped
+
+  guacamole:
+    image: guacamole/guacamole:latest
+    container_name: guacamole
+    ports:
+      - "8090:8080"
+    environment:
+      GUACD_HOSTNAME: guacd
+      POSTGRES_HOSTNAME: guacamole-db
+      POSTGRES_DATABASE: guacamole_db
+      POSTGRES_USER: guacamole_user
+      POSTGRES_PASSWORD: guacamole_pass
+    depends_on:
+      - guacd
+      - guacamole-db
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://remote.pomerium.local"
+      - "pomerium.route.to=http://guacamole:8080"
+      - "pomerium.route.policy.allow.groups=remote-access,admin"
+    restart: unless-stopped
+
+  # Ubuntu Desktop with noVNC (Web-based access)
+  ubuntu-desktop:
+    image: dorowu/ubuntu-desktop-lxde-vnc:latest
+    container_name: ubuntu-desktop
+    ports:
+      - "8091:80"     # noVNC web interface
+      - "5900:5900"   # VNC port
+    environment:
+      - VNC_PASSWORD=neogenesys
+      - RESOLUTION=1920x1080
+    volumes:
+      - ubuntu-desktop-home:/home/ubuntu
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://desktop.pomerium.local"
+      - "pomerium.route.to=http://ubuntu-desktop:80"
+      - "pomerium.route.policy.allow.groups=remote-access,admin"
+    restart: unless-stopped
+    shm_size: '2gb'
+
+  # Windows-like Desktop (Wine + noVNC)
+  wine-desktop:
+    build:
+      context: ./wine-desktop
+      dockerfile: Dockerfile
+    container_name: wine-desktop
+    ports:
+      - "8092:6080"
+    environment:
+      - VNC_PASSWORD=neogenesys
+    volumes:
+      - wine-desktop-home:/home/wine
+    networks:
+      - pomerium-network
+    labels:
+      - "pomerium.route.from=https://windows.pomerium.local"
+      - "pomerium.route.to=http://wine-desktop:6080"
+      - "pomerium.route.policy.allow.groups=remote-access,admin"
+    restart: unless-stopped
+
+networks:
+  pomerium-network:
+    name: pomerium-network
+    driver: bridge
+
+volumes:
+  grafana-data:
+  portainer-data:
+  uptime-kuma-data:
+  wekan-db-data:
+  guacamole-db-data:
+  ubuntu-desktop-home:
+  wine-desktop-home:

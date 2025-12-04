@@ -1,0 +1,76 @@
+services:
+  pomerium:
+    image: pomerium/pomerium:latest
+    container_name: pomerium
+    restart: unless-stopped
+    ports:
+      - "443:443"
+      - "80:80"
+    environment:
+      # Core Pomerium configuration
+      POMERIUM_DEBUG: "false"
+
+      # Authenticate service URL (internal Netbird DNS)
+      AUTHENTICATE_SERVICE_URL: https://authenticate.pomerium.local
+
+      # Identity Provider - Zitadel OIDC
+      IDP_PROVIDER: oidc
+      IDP_PROVIDER_URL: https://gate.kappa4.com
+      IDP_CLIENT_ID: ${ZITADEL_CLIENT_ID}
+      IDP_CLIENT_SECRET: ${ZITADEL_CLIENT_SECRET}
+      IDP_SCOPES: "openid,profile,email,groups"
+
+      # Allowed audiences for access tokens
+      IDP_ACCESS_TOKEN_ALLOWED_AUDIENCES: ${ZITADEL_CLIENT_ID}
+
+      # Signing key for JWT tokens (generate with: head -c32 /dev/urandom | base64)
+      SIGNING_KEY: ${POMERIUM_SIGNING_KEY}
+
+      # Cookie secret (generate with: head -c32 /dev/urandom | base64)
+      COOKIE_SECRET: ${POMERIUM_COOKIE_SECRET}
+
+      # Shared secret for service communication (generate with: head -c32 /dev/urandom | base64)
+      SHARED_SECRET: ${POMERIUM_SHARED_SECRET}
+
+      # Certificate configuration - using Let's Encrypt or custom certs
+      # For Netbird internal network, you might use self-signed or internal CA
+      AUTOCERT: "false"
+      CERTIFICATE_FILE: /pomerium/cert.pem
+      CERTIFICATE_KEY_FILE: /pomerium/key.pem
+
+      # Signout redirect URL - back to Zitadel
+      SIGNOUT_REDIRECT_URL: https://gate.kappa4.com
+
+      # Service mode - all-in-one for single deployment
+      # Use 'proxy' for distributed deployments
+      SERVICE_MODE: all
+
+      # Address to bind to
+      ADDRESS: :443
+      GRPC_ADDRESS: :443
+
+      # Config file for routes and policies
+      CONFIG_FILE: /pomerium/config.yaml
+
+    volumes:
+      - /opt/pomerium/config/config.yaml:/pomerium/config.yaml:ro
+      - /opt/pomerium/certs:/pomerium:ro
+      - pomerium-data:/var/lib/pomerium
+    networks:
+      - pomerium-net
+    # Only accessible through Netbird network
+    # No public IP exposure
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  pomerium-data:
+    driver: local
+
+networks:
+  pomerium-net:
+    driver: bridge
