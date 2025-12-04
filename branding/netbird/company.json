@@ -1,0 +1,35 @@
+{
+  "company": {
+    "name": "Neogenesys",
+    "displayName": "Neogenesys Remote Access",
+    "shortName": "Neogenesys",
+    "description": "Zero Trust Remote Access Platform",
+    "website": "https://neogenesys.com",
+    "support": "support@neogenesys.com",
+    "documentation": "https://docs.neogenesys.com"
+  },
+  "branding": {
+    "appName": "Neogenesys Connect",
+    "windowTitle": "Neogenesys VPN",
+    "trayTooltip": "Neogenesys - Zero Trust Access",
+    "colors": {
+      "primary": "#667eea",
+      "secondary": "#764ba2",
+      "accent": "#4c51bf",
+      "background": "#1a202c",
+      "text": "#ffffff"
+    }
+  },
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0,
+    "build": "neogenesys-001"
+  },
+  "features": {
+    "autoUpdate": true,
+    "systemTray": true,
+    "startOnBoot": true,
+    "notifications": true
+  }
+}

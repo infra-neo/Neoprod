@@ -282,6 +282,53 @@ export default function DashboardPage() {
             </Card>
           )}
 
+          {/* Remote Desktop Access */}
+          {(user.groups.includes('remote-access') || user.groups.includes('admin')) && (
+            <>
+              <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl hover:shadow-lg transition-shadow border-2 border-blue-200 dark:border-blue-800">
+                <div className="text-3xl mb-4">🖥️</div>
+                <h3 className="text-lg font-semibold mb-2">Guacamole Remote</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Gateway de acceso remoto HTML5
+                </p>
+                <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => window.open('http://localhost:8090', '_blank')}>
+                  Acceder
+                </Button>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  User: guacadmin / Pass: guacadmin
+                </p>
+              </Card>
+
+              <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl hover:shadow-lg transition-shadow border-2 border-purple-200 dark:border-purple-800">
+                <div className="text-3xl mb-4">🐧</div>
+                <h3 className="text-lg font-semibold mb-2">Ubuntu Desktop</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Escritorio Linux en navegador
+                </p>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700" onClick={() => window.open('http://localhost:8091', '_blank')}>
+                  Acceder
+                </Button>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  VNC Password: neogenesys
+                </p>
+              </Card>
+
+              <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl hover:shadow-lg transition-shadow border-2 border-indigo-200 dark:border-indigo-800">
+                <div className="text-3xl mb-4">🪟</div>
+                <h3 className="text-lg font-semibold mb-2">Windows Desktop</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Entorno Wine con apps Windows
+                </p>
+                <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={() => window.open('http://localhost:8092', '_blank')}>
+                  Acceder
+                </Button>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  VNC Password: neogenesys
+                </p>
+              </Card>
+            </>
+          )}
+
           {user.groups.includes('admin') && (
             <>
               <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl hover:shadow-lg transition-shadow">
