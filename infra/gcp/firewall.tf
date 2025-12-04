@@ -24,3 +24,60 @@ resource "google_compute_firewall" "allow_iap_ssh" {
   direction     = "INGRESS"
   priority      = 1000
 }
+
+# Allow internal VPC communication for Netbird mesh
+resource "google_compute_firewall" "allow_internal" {
+  name    = "allow-internal-vpc"
+  network = google_compute_network.secure_vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "icmp"
+  }
+
+  source_ranges = ["10.10.0.0/24"] # Internal VPC subnet
+  direction     = "INGRESS"
+  priority      = 1000
+}
+
+# Allow Netbird WireGuard traffic
+resource "google_compute_firewall" "allow_netbird_wireguard" {
+  name          = "allow-netbird-wireguard"
+  network       = google_compute_network.secure_vpc.name
+  target_tags   = ["netbird-peer"]
+
+  allow {
+    protocol = "udp"
+    ports    = ["51820"]
+  }
+
+  # Allow from anywhere for WireGuard (encrypted tunnel)
+  source_ranges = ["0.0.0.0/0"]
+  direction     = "INGRESS"
+  priority      = 1000
+}
+
+# Allow Netbird management traffic (only from VM1 to peers)
+resource "google_compute_firewall" "allow_netbird_management" {
+  name          = "allow-netbird-management"
+  network       = google_compute_network.secure_vpc.name
+  target_tags   = ["netbird-peer"]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8080", "80", "443"]
+  }
+
+  source_tags = ["zero-trust-gateway"]
+  direction   = "INGRESS"
+  priority    = 1000
+}

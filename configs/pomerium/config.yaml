@@ -1,0 +1,127 @@
+# Pomerium Configuration File
+# Zero Trust Access with Zitadel Authentication and Netbird Network
+
+# Authenticate Service URL
+authenticate_service_url: https://authenticate.pomerium.local
+
+# Routes configuration - Define your applications here
+routes:
+  # Pomerium Dashboard - Auto-login portal
+  - from: https://dashboard.pomerium.local
+    to: https://console.pomerium.local
+    pass_identity_headers: true
+    allow_public_unauthenticated_access: false
+    show_error_details: true
+    policy:
+      - allow:
+          or:
+            # Allow users from specific Zitadel groups
+            - groups:
+                is: pomerium-users
+            - groups:
+                is: admin
+    # Enable routes portal to show available apps
+    show_in_routes_portal: true
+    
+  # Example application route - adjust as needed
+  - from: https://app1.pomerium.local
+    to: http://app1-backend.internal:8080
+    pass_identity_headers: true
+    # Forward user identity to backend
+    set_request_headers:
+      X-Pomerium-Claim-Email: "${pomerium.email}"
+      X-Pomerium-Claim-Groups: "${pomerium.groups}"
+      X-Pomerium-Claim-User: "${pomerium.user}"
+    allow_websockets: true
+    allow_public_unauthenticated_access: false
+    policy:
+      - allow:
+          and:
+            # Require authenticated user
+            - authenticated_user: true
+            # Must be in specific group from Zitadel
+            - groups:
+                is: app1-users
+    show_in_routes_portal: true
+    
+  # Example application route 2
+  - from: https://app2.pomerium.local
+    to: http://app2-backend.internal:3000
+    pass_identity_headers: true
+    set_request_headers:
+      X-Pomerium-Claim-Email: "${pomerium.email}"
+      X-Pomerium-Claim-Groups: "${pomerium.groups}"
+      X-Pomerium-Claim-User: "${pomerium.user}"
+    allow_websockets: true
+    allow_public_unauthenticated_access: false
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+            - groups:
+                is: app2-users
+    show_in_routes_portal: true
+  
+  # Admin-only route example
+  - from: https://admin.pomerium.local
+    to: http://admin-backend.internal:8443
+    pass_identity_headers: true
+    set_request_headers:
+      X-Pomerium-Claim-Email: "${pomerium.email}"
+      X-Pomerium-Claim-Groups: "${pomerium.groups}"
+      X-Pomerium-Claim-User: "${pomerium.user}"
+      X-Pomerium-Claim-Roles: "${pomerium.roles}"
+    allow_websockets: true
+    allow_public_unauthenticated_access: false
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+            - groups:
+                is: admin
+    show_in_routes_portal: true
+
+# Global policy settings
+# These apply to all routes unless overridden
+policies:
+  # Default deny all
+  - name: default-policy
+    allow:
+      and:
+        - authenticated_user: true
+
+# CORS settings for web applications
+cors_allow_preflight: true
+set_response_headers:
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Referrer-Policy: same-origin
+
+# Timeout settings
+timeout_read: 30s
+timeout_write: 30s
+timeout_idle: 5m
+
+# Skip XFF append for internal network
+skip_xff_append: false
+
+# Cookie settings
+cookie_name: _pomerium
+cookie_domain: .pomerium.local
+cookie_secure: true
+cookie_http_only: true
+cookie_expire: 14h
+cookie_same_site: lax
+
+# JWT claim headers to pass to backend applications
+jwt_claims_headers:
+  - email
+  - groups
+  - user
+  - name
+  - given_name
+  - family_name
+
+# Pass identity headers to backend
+pass_identity_headers: true
