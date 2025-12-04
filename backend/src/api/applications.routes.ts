@@ -56,22 +56,104 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
 function getApplicationsForGroups(groups: string[]) {
   const allApplications = [
     {
-      id: 'tsplus-sap',
-      name: 'SAP Remote Access',
-      description: 'Access SAP applications via TSplus',
-      url: 'https://tsplus.pomerium.local',
-      icon: '🖥️',
-      type: 'remote-desktop',
-      requiredGroups: ['sap-users', 'admin']
+      id: 'app1',
+      name: 'Echo Server',
+      description: 'HTTP echo server for testing',
+      url: 'https://app1.pomerium.local',
+      icon: '📡',
+      type: 'web',
+      requiredGroups: ['app1-users', 'admin'],
+      category: 'Testing'
     },
     {
-      id: 'app1',
-      name: 'Application 1',
-      description: 'Sample web application',
-      url: 'https://app1.pomerium.local',
-      icon: '📱',
+      id: 'app2',
+      name: 'Static Site',
+      description: 'Nginx static web application',
+      url: 'https://app2.pomerium.local',
+      icon: '🌐',
       type: 'web',
-      requiredGroups: ['app1-users', 'admin']
+      requiredGroups: ['app2-users', 'admin'],
+      category: 'Web Apps'
+    },
+    {
+      id: 'whoami',
+      name: 'Identity Checker',
+      description: 'Check your identity and headers',
+      url: 'https://whoami.pomerium.local',
+      icon: '🔍',
+      type: 'web',
+      requiredGroups: ['pomerium-users', 'admin'],
+      category: 'Testing'
+    },
+    {
+      id: 'filebrowser',
+      name: 'File Browser',
+      description: 'Browse and manage files',
+      url: 'https://files.pomerium.local',
+      icon: '📁',
+      type: 'web',
+      requiredGroups: ['admin'],
+      category: 'Tools'
+    },
+    {
+      id: 'code-server',
+      name: 'VS Code',
+      description: 'Web-based code editor',
+      url: 'https://code.pomerium.local',
+      icon: '💻',
+      type: 'web',
+      requiredGroups: ['developers', 'admin'],
+      category: 'Development'
+    },
+    {
+      id: 'grafana',
+      name: 'Grafana',
+      description: 'Metrics and dashboards',
+      url: 'https://grafana.pomerium.local',
+      icon: '📊',
+      type: 'web',
+      requiredGroups: ['monitoring', 'admin'],
+      category: 'Monitoring'
+    },
+    {
+      id: 'portainer',
+      name: 'Portainer',
+      description: 'Container management interface',
+      url: 'https://portainer.pomerium.local',
+      icon: '🐳',
+      type: 'web',
+      requiredGroups: ['admin'],
+      category: 'Infrastructure'
+    },
+    {
+      id: 'uptime-kuma',
+      name: 'Uptime Kuma',
+      description: 'Uptime monitoring',
+      url: 'https://uptime.pomerium.local',
+      icon: '📈',
+      type: 'web',
+      requiredGroups: ['monitoring', 'admin'],
+      category: 'Monitoring'
+    },
+    {
+      id: 'wekan',
+      name: 'Wekan',
+      description: 'Kanban project management',
+      url: 'https://wekan.pomerium.local',
+      icon: '📋',
+      type: 'web',
+      requiredGroups: ['project-managers', 'admin'],
+      category: 'Collaboration'
+    },
+    {
+      id: 'drawio',
+      name: 'Draw.io',
+      description: 'Diagram and flowchart editor',
+      url: 'https://drawio.pomerium.local',
+      icon: '✏️',
+      type: 'web',
+      requiredGroups: ['pomerium-users', 'admin'],
+      category: 'Tools'
     },
     {
       id: 'admin-portal',
@@ -80,7 +162,8 @@ function getApplicationsForGroups(groups: string[]) {
       url: 'https://admin.pomerium.local',
       icon: '⚙️',
       type: 'web',
-      requiredGroups: ['admin']
+      requiredGroups: ['admin'],
+      category: 'Administration'
     }
   ]
 

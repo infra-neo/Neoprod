@@ -12,40 +12,110 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [loginMethod, setLoginMethod] = useState<'password' | 'sso' | 'webauthn'>('password')
+  const [error, setError] = useState('')
+
+  const isMockAuth = process.env.NEXT_PUBLIC_MOCK_AUTH === 'true'
+  const mockEmail = process.env.NEXT_PUBLIC_MOCK_USER_EMAIL || 'dev@neogenesys.local'
+  const mockPassword = 'dev123'
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // This will integrate with Zitadel OIDC
-    // For now, just simulate loading
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 2000)
+    setError('')
+
+    if (isMockAuth) {
+      // Mock authentication for development
+      setTimeout(() => {
+        if (email === mockEmail && password === mockPassword) {
+          // Store mock user data
+          const mockUser = {
+            email: process.env.NEXT_PUBLIC_MOCK_USER_EMAIL || 'dev@neogenesys.local',
+            name: process.env.NEXT_PUBLIC_MOCK_USER_NAME || 'Developer User',
+            groups: (process.env.NEXT_PUBLIC_MOCK_USER_GROUPS || 'pomerium-users').split(','),
+            authenticated: true,
+            authMethod: 'mock'
+          }
+          localStorage.setItem('mockUser', JSON.stringify(mockUser))
+          window.location.href = '/dashboard'
+        } else {
+          setError('Credenciales incorrectas. Use: ' + mockEmail + ' / ' + mockPassword)
+          setIsLoading(false)
+        }
+      }, 1000)
+    } else {
+      // Real Zitadel OIDC integration
+      setTimeout(() => {
+        setIsLoading(false)
+        setError('Autenticación real no implementada. Active NEXT_PUBLIC_MOCK_AUTH=true')
+      }, 1000)
+    }
   }
 
   const handleSSOLogin = async (provider: string) => {
     setIsLoading(true)
-    // Redirect to Zitadel SSO
-    window.location.href = `${process.env.NEXT_PUBLIC_ZITADEL_DOMAIN}/oauth/v2/authorize?client_id=${process.env.NEXT_PUBLIC_ZITADEL_CLIENT_ID}&redirect_uri=${window.location.origin}/auth/callback&response_type=code&scope=openid%20profile%20email%20groups`
+    setError('')
+
+    if (isMockAuth) {
+      // Mock SSO for development
+      setTimeout(() => {
+        const mockUser = {
+          email: process.env.NEXT_PUBLIC_MOCK_USER_EMAIL || 'dev@neogenesys.local',
+          name: process.env.NEXT_PUBLIC_MOCK_USER_NAME || 'Developer User',
+          groups: (process.env.NEXT_PUBLIC_MOCK_USER_GROUPS || 'pomerium-users').split(','),
+          authenticated: true,
+          authMethod: 'sso-mock',
+          provider: provider
+        }
+        localStorage.setItem('mockUser', JSON.stringify(mockUser))
+        window.location.href = '/dashboard'
+      }, 1000)
+    } else {
+      // Real Zitadel SSO redirect
+      window.location.href = `${process.env.NEXT_PUBLIC_ZITADEL_DOMAIN}/oauth/v2/authorize?client_id=${process.env.NEXT_PUBLIC_ZITADEL_CLIENT_ID}&redirect_uri=${window.location.origin}/auth/callback&response_type=code&scope=openid%20profile%20email%20groups`
+    }
   }
 
   const handleWebAuthn = async () => {
     setIsLoading(true)
-    // Implement WebAuthn authentication
-    // This would call the backend API to initiate WebAuthn challenge
-    try {
-      // Placeholder for WebAuthn implementation
-      console.log('WebAuthn authentication')
-    } catch (error) {
-      console.error('WebAuthn error:', error)
+    setError('')
+
+    if (isMockAuth) {
+      // Mock WebAuthn for development
+      setTimeout(() => {
+        const mockUser = {
+          email: process.env.NEXT_PUBLIC_MOCK_USER_EMAIL || 'dev@neogenesys.local',
+          name: process.env.NEXT_PUBLIC_MOCK_USER_NAME || 'Developer User',
+          groups: (process.env.NEXT_PUBLIC_MOCK_USER_GROUPS || 'pomerium-users').split(','),
+          authenticated: true,
+          authMethod: 'webauthn-mock'
+        }
+        localStorage.setItem('mockUser', JSON.stringify(mockUser))
+        window.location.href = '/dashboard'
+      }, 1500)
+    } else {
+      // Real WebAuthn implementation
+      try {
+        setError('WebAuthn no implementado aún. Use modo mock para desarrollo.')
+        setIsLoading(false)
+      } catch (error) {
+        console.error('WebAuthn error:', error)
+        setError('Error en WebAuthn')
+        setIsLoading(false)
+      }
     }
-    setIsLoading(false)
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[size:75px_75px]" />
       
+      {/* Development Mode Banner */}
+      {isMockAuth && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+          <p className="text-sm font-semibold">🔓 MODO DESARROLLO - Credenciales: {mockEmail} / {mockPassword}</p>
+        </div>
+      )}
+
       <Card className="w-full max-w-md relative z-10 shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
         <div className="p-8">
           {/* Logo and Header */}
@@ -97,6 +167,13 @@ export default function LoginPage() {
               <span className="text-sm font-medium">WebAuthn</span>
             </button>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+            </div>
+          )}
 
           {/* Password Login Form */}
           {loginMethod === 'password' && (

@@ -79,19 +79,58 @@ Actualmente no está implementado. Usa SSO.
 
 ## 🧪 Modo Desarrollo (Sin Zitadel)
 
-Si necesitas desarrollar sin conexión a Zitadel, puedes:
+Si necesitas desarrollar sin conexión a Zitadel, puedes usar el modo mock:
 
-### Opción A: Mock Authentication
+### ✅ Modo Mock ACTIVADO
 
-Crear archivo `.env.local` con:
+El archivo `.env.local` ya incluye:
 
 ```bash
 NEXT_PUBLIC_MOCK_AUTH=true
-NEXT_PUBLIC_MOCK_USER_EMAIL=dev@test.com
-NEXT_PUBLIC_MOCK_USER_NAME=Dev User
+NEXT_PUBLIC_MOCK_USER_EMAIL=dev@neogenesys.local
+NEXT_PUBLIC_MOCK_USER_NAME=Developer User
+NEXT_PUBLIC_MOCK_USER_GROUPS=pomerium-users,app1-users,app2-users,admin
 ```
 
-**NOTA**: Esta funcionalidad debe ser implementada en el código.
+### 🔐 Credenciales de Prueba
+
+**Email**: `dev@neogenesys.local`  
+**Password**: `dev123`
+
+### 📝 Cómo usar:
+
+1. Abre `http://localhost:3000`
+2. Verás un banner verde indicando "MODO DESARROLLO"
+3. Ingresa las credenciales:
+   - Email: `dev@neogenesys.local`
+   - Password: `dev123`
+4. O simplemente usa el botón "Sign in with SSO"
+5. Serás redirigido al dashboard automáticamente
+
+### 🎯 Características del Modo Mock:
+
+- ✅ Login con password funcional
+- ✅ SSO simulado (todos los proveedores)
+- ✅ WebAuthn simulado
+- ✅ Asignación de grupos automática
+- ✅ Dashboard con aplicaciones según grupos
+- ✅ No requiere Netbird VPN
+- ✅ No requiere conexión a Zitadel
+
+### 🔄 Cambiar entre Mock y Producción:
+
+**Modo Desarrollo (Mock)**:
+```bash
+NEXT_PUBLIC_MOCK_AUTH=true
+```
+
+**Modo Producción (Zitadel Real)**:
+```bash
+NEXT_PUBLIC_MOCK_AUTH=false
+# o simplemente eliminar la línea
+```
+
+**NOTA**: ✅ Esta funcionalidad YA está implementada en el código.
 
 ### Opción B: Backend Local con Supabase
 
