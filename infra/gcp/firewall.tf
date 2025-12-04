@@ -51,9 +51,9 @@ resource "google_compute_firewall" "allow_internal" {
 
 # Allow Netbird WireGuard traffic
 resource "google_compute_firewall" "allow_netbird_wireguard" {
-  name          = "allow-netbird-wireguard"
-  network       = google_compute_network.secure_vpc.name
-  target_tags   = ["netbird-peer"]
+  name        = "allow-netbird-wireguard"
+  network     = google_compute_network.secure_vpc.name
+  target_tags = ["netbird-peer"]
 
   allow {
     protocol = "udp"
@@ -68,9 +68,9 @@ resource "google_compute_firewall" "allow_netbird_wireguard" {
 
 # Allow Netbird management traffic (only from VM1 to peers)
 resource "google_compute_firewall" "allow_netbird_management" {
-  name          = "allow-netbird-management"
-  network       = google_compute_network.secure_vpc.name
-  target_tags   = ["netbird-peer"]
+  name        = "allow-netbird-management"
+  network     = google_compute_network.secure_vpc.name
+  target_tags = ["netbird-peer"]
 
   allow {
     protocol = "tcp"

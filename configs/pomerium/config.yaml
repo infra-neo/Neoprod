@@ -22,7 +22,7 @@ routes:
                 is: admin
     # Enable routes portal to show available apps
     show_in_routes_portal: true
-    
+
   # Example application route - adjust as needed
   - from: https://app1.pomerium.local
     to: http://app1-backend.internal:8080
@@ -43,7 +43,7 @@ routes:
             - groups:
                 is: app1-users
     show_in_routes_portal: true
-    
+
   # Example application route 2
   - from: https://app2.pomerium.local
     to: http://app2-backend.internal:3000
@@ -61,7 +61,7 @@ routes:
             - groups:
                 is: app2-users
     show_in_routes_portal: true
-  
+
   # Admin-only route example
   - from: https://admin.pomerium.local
     to: http://admin-backend.internal:8443
